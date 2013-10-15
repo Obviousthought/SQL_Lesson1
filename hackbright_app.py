@@ -7,19 +7,32 @@ def get_student_by_github(github):
     query = """SELECT first_name, last_name, github FROM Students WHERE github = ?"""
     DB.execute(query, (github,))
     row = DB.fetchone()
-    print """\
-Student: %s %s
-Github account: %s"""%(row[0], row[1], row[2])
+    return row
 
-def get_projects_by_title(title):
-    query = """SELECT * FROM Projects WHERE title = ?"""
+# def get_github_by_student(first_name, last_name):
+#     query = """SELECT github FROM Students WHERE first_name = ? and last_name = ?"""
+#     DB.execute(query, (first_name, last_name, ))
+#     row = DB.fetchone()
+#     return row
+
+def get_project_grades(title):
+    query = """SELECT ReportCardView.first_name, 
+                        ReportCardView.last_name, 
+                        ReportCardView.grade,
+                        Grades.student_github
+    FROM ReportCardView INNER JOIN Grades ON ReportCardView.grade=Grades.grade
+    WHERE title = ?"""
     DB.execute(query, (title,))
     rows = DB.fetchall()
-    for row in rows:
-        print """\
-    Project: %s
-    Description: %s
-    Maximum Grade: %d"""%(row[0], row[1], row[2])
+    return rows
+
+def get_projects_by_title(title):
+    query = """SELECT title, description, max_grade 
+            FROM Projects 
+            WHERE title = ?"""
+    DB.execute(query, (title,))
+    rows = DB.fetchall()
+    return rows[0]
 
 def student_project_grade(first_name, last_name, project):
     query="""SELECT *
@@ -36,10 +49,7 @@ def student_grades(first_name, last_name):
     WHERE gv.first_name = ? AND gv.last_name = ?"""
     DB.execute(query, (first_name, last_name,))
     rows = DB.fetchall()
-    for row in rows:
-        print """\
-    %s %s received a %d on project: %s."""%(row[0], row[1], row[3], row[2]) 
-
+    return rows
 
 def connect_to_db():
     global DB, CONN
@@ -51,6 +61,7 @@ def make_new_student(first_name, last_name, github):
     DB.execute(query, (first_name, last_name, github))
     CONN.commit()
     print "Successfully added student: %s %s"%(first_name, last_name)
+    return True
 
 def make_new_project(title, description, max_grade):
     query = """INSERT into Projects (title, description, max_grade) values (?,?,?)"""
@@ -87,6 +98,8 @@ def main():
             make_new_project(*args)
         elif command == "new_grade":
             make_new_grade(*args)
+        elif command == "project_grades":
+            get_project_grades(*args)
 
     CONN.close()
 

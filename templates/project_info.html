@@ -1,0 +1,19 @@
+<html>
+<body>
+<h1>Project Title: {{project_title}}</h1>
+<h2>Project Description: {{description}}</h2>
+
+<ul>
+{% for student in students%}
+  <li>Name: 
+    <a href="/student?student={{ student[3] }}">
+    {{ student[0] }} {{ student[1] }}<br>
+    </a>
+    Grade: {{student[2]}}/{{max_grade}} </li><br>
+{% endfor %}
+</ul>
+
+
+
+</body>
+</html>
