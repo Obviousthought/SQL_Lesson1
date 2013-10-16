@@ -42,22 +42,46 @@ def add_new_student():
     hackbright_app.connect_to_db()
     return render_template("insert_new_student.html")
 
-@app.route("/new_student")
+
+@app.route("/new_student", methods = ["POST"])
 def new_student():
     hackbright_app.connect_to_db()
 
-    new_student_firstname = request.args.get("firstname")
-    new_student_lastname = request.args.get("lastname")
-    new_student_github = request.args.get("github")
-    if hackbright_app.make_new_student(new_student_firstname, 
+    new_student_firstname = request.form.get("firstname")
+    new_student_lastname = request.form.get("lastname")
+    new_student_github = request.form.get("github")
+    #if new_student_firstname != None:
+    #if 
+    hackbright_app.make_new_student(new_student_firstname, 
                                     new_student_lastname, 
-                                    new_student_github):
+                                    new_student_github)
 
-        return redirect("/student")
-    else:
-        pass
+    return redirect("/student?student=%s" % new_student_github)
+    #else:
+    #    error = "error message"
+
         #new student is either already in the system or was entered incorrectly
         #try again
+
+
+@app.route("/add_new_project")
+def add_new_project():
+    hackbright_app.connect_to_db()
+    return render_template("insert_new_project.html")
+
+
+@app.route("/new_project", methods = ["POST"])
+def new_project():
+    hackbright_app.connect_to_db()
+
+    new_project_title = request.form.get("title")
+    new_project_description = request.form.get("description")
+    new_project_max_grade = request.form.get("max_grade")
+    hackbright_app.make_new_project(new_project_title, new_project_description, new_project_max_grade)
+
+    return redirect("/project?project=%s" % new_project_title)
+
+    # returns an empty list! Need to fix this
 
 if __name__=="__main__":
     app.run(debug=True)
